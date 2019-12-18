@@ -52,7 +52,7 @@ Name:           mesa
 Summary:        Mesa graphics libraries
 %global ver 19.3.0
 Version:        %{lua:ver = string.gsub(rpm.expand("%{ver}"), "-", "~"); print(ver)}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            http://www.mesa3d.org
 
@@ -61,6 +61,15 @@ Source0:        https://mesa.freedesktop.org/archive/%{name}-%{ver}.tar.xz
 # Source1 contains email correspondence clarifying the license terms.
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
+Source2:        https://mesa.freedesktop.org/archive/%{name}-%{ver}.tar.xz.sig
+# upstream does not publish its GPG keys used for signing
+# "trust on first use" for now until
+#    https://gitlab.freedesktop.org/mesa/mesa/issues/2140
+# is resolved.
+# gpg2 --keyserver pool.sks-keyservers.net --recv-key 71C4B75620BC75708B4BDB254C95FAAB3EB073EC
+# gpg2 --export --export-options export-minimal "71C4B75620BC75708B4BDB254C95FAAB3EB073EC" > gpgkey-dylan-baker-71C4B75620BC75708B4BDB254C95FAAB3EB073EC.gpg
+Source3:        gpgkey-dylan-baker-71C4B75620BC75708B4BDB254C95FAAB3EB073EC.gpg
+
 
 # https://gitlab.freedesktop.org/mesa/mesa/issues/2042
 Patch0:         fix-arm-build.patch
@@ -71,6 +80,7 @@ BuildRequires:  meson >= 0.45
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
+BuildRequires:  gnupg2
 
 %if 0%{?with_hardware}
 BuildRequires:  kernel-headers
@@ -324,6 +334,7 @@ Requires:       vulkan-devel
 Headers for development with the Vulkan API.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE3}' --signature='%{SOURCE2}' --data='%{SOURCE0}'
 %autosetup -n %{name}-%{ver} -p1
 cp %{SOURCE1} docs/
 
@@ -584,6 +595,9 @@ popd
 %endif
 
 %changelog
+* Wed Dec 18 2019 Felix Schwarz <fschwarz@fedoraproject.org> - 19.3.0-2
+- enable GPG-based source file verification
+
 * Mon Dec 16 2019 Pete Walter <pwalter@fedoraproject.org> - 19.3.0-1
 - Update to 19.3.0
 

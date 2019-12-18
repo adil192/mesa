@@ -3,6 +3,7 @@
 .build*
 /mesa-*.tar.bz2
 /mesa-*.tar.xz
+/mesa-*.tar.xz.sig
 x86_64/
 results_mesa/
 mesa-*/
