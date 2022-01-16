@@ -1,0 +1,26 @@
+--- imesa-21.3.3/src/gallium/drivers/iris/iris_batch.c	2022-01-16 00:18:30.562899868 +0000
++++ iris_batch_modified.c	2022-01-16 00:20:35.278958599 +0000
+@@ -716,6 +716,13 @@
+    if (deps->write_syncobjs[other_batch_idx])
+       move_syncobj_to_batch(batch, &deps->write_syncobjs[other_batch_idx],
+                             I915_EXEC_FENCE_WAIT);
++  
++     /* If it's being written by our screen, wait on it too. This is relevant
++    * when there are multiple contexts on the same screen. */
++   if (deps->write_syncobjs[batch_idx])
++      move_syncobj_to_batch(batch, &deps->write_syncobjs[batch_idx],
++                            I915_EXEC_FENCE_WAIT);
++
+ 
+    struct iris_syncobj *batch_syncobj = iris_batch_get_signal_syncobj(batch);
+ 
+@@ -729,6 +736,9 @@
+ 
+       move_syncobj_to_batch(batch, &deps->read_syncobjs[other_batch_idx],
+                            I915_EXEC_FENCE_WAIT);
++     
++      move_syncobj_to_batch(batch, &deps->read_syncobjs[batch_idx],
++                           I915_EXEC_FENCE_WAIT);
+ 
+    } else {
+       /* If we're reading, replace the other read from our batch index. */
