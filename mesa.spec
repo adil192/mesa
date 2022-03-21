@@ -8,7 +8,6 @@
 %global with_omx 1
 %global with_opencl 1
 %endif
-%global base_dri nouveau,r100,r200
 %global base_vulkan ,amd
 %endif
 
@@ -16,10 +15,9 @@
 %global with_crocus 1
 %global with_iris   1
 %global with_vmware 1
-%global with_xa     1	
+%global with_xa     1
 %global with_d3d12  1
-%global platform_dri ,i915,i965
-%global platform_vulkan ,intel	
+%global platform_vulkan ,intel
 %global __meson_wrap_mode default
 %endif
 
@@ -54,9 +52,6 @@
 %bcond_with valgrind
 %endif
 
-%if !0%{?rhel}
-%global dri_drivers %{?base_dri}%{?platform_dri}
-%endif
 %global vulkan_drivers swrast%{?base_vulkan}%{?platform_vulkan}
 
 Name:           mesa
@@ -323,18 +318,11 @@ Requires:       %{name}-libd3d%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release
 %package vulkan-drivers
 Summary:        Mesa Vulkan drivers
 Requires:       vulkan%{_isa}
+Obsoletes:      mesa-vulkan-devel < %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description vulkan-drivers
 The drivers with support for the Vulkan API.
 
-%package vulkan-devel
-Summary:        Mesa Vulkan development files
-Requires:       %{name}-vulkan-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       vulkan-devel
-
-%description vulkan-devel
-Headers for development with the Vulkan API.
-	
 %if 0%{?with_d3d12}
 %package d3d12
 Summary:        Mesa Direct3D12
@@ -370,7 +358,6 @@ cp %{SOURCE1} docs/
 %meson \
   -Dplatforms=x11,wayland \
   -Ddri3=enabled \
-  -Ddri-drivers=%{?dri_drivers} \
   -Dosmesa=true \
 %if 0%{?with_hardware}
   -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink}%{?with_d3d12:,d3d12} \
@@ -515,11 +502,6 @@ popd
 %{_libdir}/dri/virtio_gpu_dri.so
 
 %if 0%{?with_hardware}
-%if !0%{?rhel}
-%{_libdir}/dri/radeon_dri.so
-%{_libdir}/dri/r200_dri.so
-%{_libdir}/dri/nouveau_vieux_dri.so
-%endif
 %if 0%{?with_r300}
 %{_libdir}/dri/r300_dri.so
 %endif
@@ -530,11 +512,6 @@ popd
 %{_libdir}/dri/radeonsi_dri.so
 %endif
 %ifarch %{ix86} x86_64
-%if !0%{?rhel}
-%{_libdir}/dri/i830_dri.so
-%{_libdir}/dri/i915_dri.so
-%{_libdir}/dri/i965_dri.so
-%endif
 %{_libdir}/dri/crocus_dri.so
 %{_libdir}/dri/iris_dri.so
 %endif
@@ -542,9 +519,11 @@ popd
 %{_libdir}/dri/ingenic-drm_dri.so
 %{_libdir}/dri/imx-drm_dri.so
 %{_libdir}/dri/kirin_dri.so
+%{_libdir}/dri/komeda_dri.so
 %{_libdir}/dri/mali-dp_dri.so
 %{_libdir}/dri/mcde_dri.so
 %{_libdir}/dri/mxsfb-drm_dri.so
+%{_libdir}/dri/rcar-du_dri.so
 %{_libdir}/dri/stm_dri.so
 %endif
 %if 0%{?with_vc4}
@@ -646,8 +625,6 @@ popd
 %endif
 %endif
 
-%files vulkan-devel
-	
 %if 0%{?with_d3d12}
 %files d3d12
 %{_libdir}/dri/d3d12_dri.so
@@ -657,7 +634,7 @@ popd
 %{_includedir}/dxguids
 %{_includedir}/wsl
 %{_libdir}/pkgconfig/DirectX-Headers.pc
- 
+
 %files d3d12-static
 %{_libdir}/libDirectX-Guids.a
 %endif
