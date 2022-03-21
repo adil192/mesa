@@ -601,6 +601,7 @@ popd
 %{_datadir}/vulkan/implicit_layer.d/VkLayer_MESA_device_select.json
 %if 0%{?with_vulkan_hw}
 %{_libdir}/libvulkan_radeon.so
+%{_datadir}/drirc.d/00-radv-defaults.conf
 %{_datadir}/vulkan/icd.d/radeon_icd.*.json
 %ifarch %{ix86} x86_64
 %{_libdir}/libvulkan_intel.so
