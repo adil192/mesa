@@ -16,9 +16,11 @@
 %global with_crocus 1
 %global with_iris   1
 %global with_vmware 1
-%global with_xa     1
+%global with_xa     1	
+%global with_d3d12  1
 %global platform_dri ,i915,i965
-%global platform_vulkan ,intel
+%global platform_vulkan ,intel	
+%global __meson_wrap_mode default
 %endif
 
 %ifarch %{arm} aarch64
@@ -27,13 +29,15 @@
 %global with_lima      1
 %global with_vc4       1
 %global with_v3d       1
-%endif
+%endif	
+%global with_d3d12  1
 %global with_freedreno 1
 %global with_kmsro     1
 %global with_panfrost  1
 %global with_tegra     1
 %global with_xa        1
 %global platform_vulkan ,broadcom,freedreno,panfrost
+%global __meson_wrap_mode default
 %endif
 
 %ifnarch %{arm} s390x
@@ -143,6 +147,10 @@ BuildRequires:  vulkan-headers
 BuildRequires:  glslang
 %if 0%{?with_vulkan_hw}
 BuildRequires:  pkgconfig(vulkan)
+%endif
+%if 0%{?with_d3d12}
+BuildRequires:  git
+BuildRequires:  cmake
 %endif
 
 %description
@@ -326,6 +334,28 @@ Requires:       vulkan-devel
 
 %description vulkan-devel
 Headers for development with the Vulkan API.
+	
+%if 0%{?with_d3d12}
+%package d3d12
+Summary:        Mesa Direct3D12
+ 
+%description d3d12
+%{summary}.
+ 
+%package d3d12-devel
+Summary:        Mesa Direct3D12
+Requires:       %{name}-d3d12%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+ 
+%description d3d12-devel
+%{summary}.
+ 
+%package d3d12-static
+Summary:        Mesa Direct3D12
+Requires:       %{name}-d3d12%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+ 
+%description d3d12-static
+%{summary}.
+%endif
 
 %prep
 %autosetup -n %{name}-%{ver} -p1
@@ -343,7 +373,7 @@ cp %{SOURCE1} docs/
   -Ddri-drivers=%{?dri_drivers} \
   -Dosmesa=true \
 %if 0%{?with_hardware}
-  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink} \
+  -Dgallium-drivers=swrast,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_kmsro:,kmsro}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink}%{?with_d3d12:,d3d12} \
 %else
   -Dgallium-drivers=swrast,virgl \
 %endif
@@ -618,6 +648,20 @@ popd
 %endif
 
 %files vulkan-devel
+	
+%if 0%{?with_d3d12}
+%files d3d12
+%{_libdir}/dri/d3d12_dri.so
+ 
+%files d3d12-devel
+%{_includedir}/directx
+%{_includedir}/dxguids
+%{_includedir}/wsl
+%{_libdir}/pkgconfig/DirectX-Headers.pc
+ 
+%files d3d12-static
+%{_libdir}/libDirectX-Guids.a
+%endif
 
 %changelog
 %autochangelog
