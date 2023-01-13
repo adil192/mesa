@@ -190,7 +190,10 @@ Provides:       libEGL-devel%{?_isa}
 Summary:        Mesa-based DRI drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 %if 0%{?with_va}
+# Use unversioned recommends for mesa-va-drivers%%{?_isa}
+# It's installed by default, but not enforced on upgrades - rhbz#2161338
 Recommends:     %{name}-va-drivers%{?_isa}
+Requires:       (%{name}-va-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release} if %{name}-va-drivers%{?_isa})
 %endif
 
 %description dri-drivers
