@@ -75,6 +75,10 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch10:        gnome-shell-glthread-disable.patch
 
+# clang_resources_dir for LLVM 17 change
+# https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/23981
+Patch20:       23981.patch
+
 BuildRequires:  meson >= 1.2.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
