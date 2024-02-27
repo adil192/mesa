@@ -42,6 +42,7 @@
 %if !0%{?rhel}
 %global with_lima      1
 %global with_vc4       1
+%global with_d3d12     1
 %global with_etnaviv   1
 %global with_tegra     1
 %global with_asahi     1
