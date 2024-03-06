@@ -328,6 +328,7 @@ Requires:       ocl-icd%{?_isa}
 Requires:       libclc%{?_isa}
 Requires:       %{name}-libgbm%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       opencl-filesystem
+Requires:       spirv-llvm-translator
 
 %description libOpenCL
 %{summary}.
