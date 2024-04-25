@@ -393,6 +393,9 @@ export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %define _lto_cflags %{nil}
 
 %meson \
+ # Bug 2273772 - fatal Intel Gen12 gfx H/W error with i915 drvr; need F40 Mesa upgrade for kernel 6.8+ new Intel Xe drvr support
+ #   https://bugzilla.redhat.com/show_bug.cgi?id=2273772
+  -Dintel-xe-kmd=enabled \
   -Dplatforms=x11,wayland \
   -Ddri3=enabled \
   -Dosmesa=true \
