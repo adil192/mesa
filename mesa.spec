@@ -5,7 +5,6 @@
 %global with_va 1
 %if !0%{?rhel}
 %global with_nine 1
-%global with_nvk 0
 %global with_omx 1
 %global with_opencl 1
 %endif
