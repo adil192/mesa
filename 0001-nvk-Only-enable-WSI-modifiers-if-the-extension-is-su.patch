@@ -1,0 +1,33 @@
+From 726838620ebdd890edf481d7821edc0728b1ebe4 Mon Sep 17 00:00:00 2001
+From: Dave Airlie <airlied@redhat.com>
+Date: Thu, 6 Jun 2024 10:26:25 +1000
+Subject: [PATCH] nvk: Only enable WSI modifiers if the extension is supported.
+
+The extension relies on the kernel being new, so don't tell
+wsi about it.
+
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/issues/11270
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/issues/11166
+Fixes: e6f77defec0d ("nvk/wsi: Advertise modifier support")
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/29563>
+---
+ src/nouveau/vulkan/nvk_wsi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/nouveau/vulkan/nvk_wsi.c b/src/nouveau/vulkan/nvk_wsi.c
+index 6c9c459ad36..11c554721ac 100644
+--- a/src/nouveau/vulkan/nvk_wsi.c
++++ b/src/nouveau/vulkan/nvk_wsi.c
+@@ -29,7 +29,8 @@ nvk_init_wsi(struct nvk_physical_device *pdev)
+       return result;
+ 
+    pdev->wsi_device.supports_scanout = false;
+-   pdev->wsi_device.supports_modifiers = true;
++   pdev->wsi_device.supports_modifiers =
++      pdev->vk.supported_extensions.table.EXT_image_drm_format_modifier;
+ 
+    pdev->vk.wsi_device = &pdev->wsi_device;
+ 
+-- 
+2.45.2
+
