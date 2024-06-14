@@ -78,6 +78,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch10:        gnome-shell-glthread-disable.patch
 Patch11:        0001-nvk-Only-enable-WSI-modifiers-if-the-extension-is-su.patch
+Patch12:        fix-llvmpipe-dma-buf.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc

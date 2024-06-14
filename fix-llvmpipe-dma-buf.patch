@@ -1,0 +1,41 @@
+From db38a4913ec6fde264facf95077e241c64573b27 Mon Sep 17 00:00:00 2001
+From: Lucas Fryzek <lfryzek@igalia.com>
+Date: Mon, 3 Jun 2024 11:39:27 +0100
+Subject: [PATCH] llvmpipe: query winsys support for dmabuf mapping
+
+Fixes #11257 by ensuring winsys mapping functions is only called
+if its supported by the winsys, which should prevent llvmpipe from
+crashing with kmswast.
+
+If the winsys is kms_swrast then this method will be null, but on
+drisw it will be available.
+
+Reviewed-by: Erik Faye-Lund <erik.faye-lund@collabora.com>
+Reviewed-By: Mike Blumenkrantz <michael.blumenkrantz@gmail.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/29546>
+---
+ src/gallium/drivers/llvmpipe/lp_texture.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/gallium/drivers/llvmpipe/lp_texture.c b/src/gallium/drivers/llvmpipe/lp_texture.c
+index 9bad41a983682..6e86a6da06cb6 100644
+--- a/src/gallium/drivers/llvmpipe/lp_texture.c
++++ b/src/gallium/drivers/llvmpipe/lp_texture.c
+@@ -664,7 +664,13 @@ llvmpipe_resource_from_handle(struct pipe_screen *_screen,
+ #ifdef HAVE_LINUX_UDMABUF_H
+       struct llvmpipe_memory_fd_alloc *alloc;
+       uint64_t size;
+-      if(_screen->import_memory_fd(_screen, whandle->handle, (struct pipe_memory_allocation**)&alloc, &size, true)) {
++      /* Not all winsys implement displaytarget_create_mapped so we need to check
++       * that is available (not null).
++       */
++      if (winsys->displaytarget_create_mapped &&
++          _screen->import_memory_fd(_screen, whandle->handle,
++                                    (struct pipe_memory_allocation**)&alloc,
++                                    &size, true)) {
+          data = alloc->data;
+          lpr->dt = winsys->displaytarget_create_mapped(winsys, template->bind,
+                                                        template->format, template->width0, template->height0,
+-- 
+GitLab
+
