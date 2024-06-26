@@ -76,7 +76,8 @@ Source0:        https://archive.mesa3d.org/mesa-%{ver}.tar.xz
 # Fedora opts to ignore the optional part of clause 2 and treat that code as 2 clause BSD.
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
-Patch10:        gnome-shell-glthread-disable.patch
+Patch:          gnome-shell-glthread-disable.patch
+Patch:          fix-egl-on-s390x.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
