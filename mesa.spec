@@ -79,6 +79,7 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 Patch10:        gnome-shell-glthread-disable.patch
 Patch11:        0001-llvmpipe-Init-eglQueryDmaBufModifiersEXT-num_modifie.patch
 Patch12:        0001-Revert-ac-radeonsi-remove-has_syncobj-has_fence_to_h.patch
+Patch13:        0001-mesa-st-load-state-params-for-feedback-draws-with-al.patch
 
 # s390x only
 Patch100:       fix-egl-on-s390x.patch

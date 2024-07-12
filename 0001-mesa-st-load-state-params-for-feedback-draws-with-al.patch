@@ -1,0 +1,29 @@
+From d83a0414727d682d9448305c8fe63c014b080e94 Mon Sep 17 00:00:00 2001
+From: Mike Blumenkrantz <michael.blumenkrantz@gmail.com>
+Date: Thu, 11 Jul 2024 12:13:00 -0400
+Subject: [PATCH] mesa/st: load state params for feedback draws with
+ allow_st_finalize_nir_twice
+
+this should ensure that the params are always updated
+
+Fixes: 5eb0136a3c5 ("mesa/st: when creating draw shader variants, use the base nir and skip driver opts")
+---
+ src/mesa/state_tracker/st_draw_feedback.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/mesa/state_tracker/st_draw_feedback.c b/src/mesa/state_tracker/st_draw_feedback.c
+index 0a60b5cd2f3..03d2bee2a71 100644
+--- a/src/mesa/state_tracker/st_draw_feedback.c
++++ b/src/mesa/state_tracker/st_draw_feedback.c
+@@ -181,7 +181,7 @@ st_feedback_draw_vbo(struct gl_context *ctx,
+     * in gl_program_parameter_list because allow_constbuf0_as_real_buffer
+     * is set.
+     */
+-   if (st->prefer_real_buffer_in_constbuf0 && params->StateFlags)
++   if ((st->prefer_real_buffer_in_constbuf0 || st->allow_st_finalize_nir_twice) && params->StateFlags)
+       _mesa_load_state_parameters(st->ctx, params);
+ 
+    draw_set_constant_buffer_stride(draw, sizeof(float));
+-- 
+2.45.2
+
