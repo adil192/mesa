@@ -88,6 +88,8 @@ Patch11:        0001-egl-never-select-swrast-for-vmwgfx.patch
 # https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33248
 Patch12:        https://gitlab.freedesktop.org/mesa/mesa/-/commit/3b78dcec058e.patch#/mesa-24.3.4-radeonsi-disallow-compute-queues-on-Raven_Raven2-due-to-hangs.patch
 
+Patch20:        0001-vulkan-wsi-x11-fix-use-of-uninitialised-xfixes-regio.patch
+
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
