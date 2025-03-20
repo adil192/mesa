@@ -67,7 +67,7 @@
 
 Name:           mesa
 Summary:        Mesa graphics libraries
-%global ver 25.0.1
+%global ver 25.0.2
 Version:        %{lua:ver = string.gsub(rpm.expand("%{ver}"), "-", "~"); print(ver)}
 Release:        %autorelease
 License:        MIT AND BSD-3-Clause AND SGI-B-2.0
@@ -80,6 +80,10 @@ Source0:        https://archive.mesa3d.org/mesa-%{ver}.tar.xz
 Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch10:        gnome-shell-glthread-disable.patch
+
+# Backport of https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33805
+# to fix clover with libclc from LLVM 20.
+Patch20:        e4eb5e80c316c0af3fff310ca89e1175d81556c1.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
