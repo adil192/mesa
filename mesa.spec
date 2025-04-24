@@ -93,6 +93,16 @@ Patch23:        0003-vulkan-wsi-implement-support-for-VK_EXT_hdr_metadata.patch
 Patch24:        0004-vulkan-wsi-handle-the-compositor-not-supporting-exte.patch
 Patch25:        0001-meson-update-wayland-protocols-source_hash.patch
 Patch26:        0001-docs-features-add-VK_EXT_hdr_metadata.patch
+# Additional fixups for color management:
+# https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/33804
+Patch27:        0001-vulkan-wsi-dont-use-srgb-if-the-compositor.patch
+# https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34000
+Patch28:        0001-vulkan-wsi-validate-hdr-metadata.patch
+Patch29:        0002-vulkan-wsi-warn-once-when-hdr-metadata-is-skipped.patch
+# https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34353
+Patch31:        0001-vulkan-wsi-wayland-initialize-surface-colorspace.patch
+# https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34410
+Patch32:        0001-vulkan-wsi-wayland-avoid-duplicate-colorspace-entry.patch
 
 # This patch makes Fedora CI fail and causes issues in QEMU. Revert it until
 # we find a fix.

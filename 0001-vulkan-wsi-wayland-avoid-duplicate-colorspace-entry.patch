@@ -1,0 +1,33 @@
+From c2570055d5b45df6f2c10c2c1f2235c77db5641f Mon Sep 17 00:00:00 2001
+From: Lars-Ivar Hesselberg Simonsen <lars-ivar.simonsen@arm.com>
+Date: Mon, 7 Apr 2025 16:29:25 +0200
+Subject: [PATCH] vulkan/wsi/wayland: Avoid duplicate colorspace entry
+
+The colorspace SRGB_NONLINEAR could be added twice when querying
+available formats, leading to duplicate entries and VulkanCTS WSI test
+failures.
+
+Fixes: 789507c99c6 ("vulkan/wsi: implement the Wayland color management protocol")
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34410>
+---
+ src/vulkan/wsi/wsi_common_wayland.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/vulkan/wsi/wsi_common_wayland.c b/src/vulkan/wsi/wsi_common_wayland.c
+index 6632522292798..ddfbd863c94b0 100644
+--- a/src/vulkan/wsi/wsi_common_wayland.c
++++ b/src/vulkan/wsi/wsi_common_wayland.c
+@@ -1033,7 +1033,9 @@ wsi_wl_display_determine_colorspaces(struct wsi_wl_display *display)
+ 
+    struct u_vector *tfs = &display->color_transfer_funcs;
+    struct u_vector *primaries = &display->color_primaries;
+-   for (int i = 0; i < ARRAY_SIZE(colorspace_mapping); i++) {
++   /* Skip SRGB_NONLINEAR (i = 0), which has already been added above. */
++   assert(colorspace_mapping[0].colorspace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR);
++   for (int i = 1; i < ARRAY_SIZE(colorspace_mapping); i++) {
+       if (!vector_contains(primaries, colorspace_mapping[i].primaries))
+          continue;
+       if (!vector_contains(tfs, colorspace_mapping[i].tf))
+-- 
+GitLab
+
