@@ -98,7 +98,7 @@ Patch26:        0001-docs-features-add-VK_EXT_hdr_metadata.patch
 # we find a fix.
 # https://bugzilla.redhat.com/show_bug.cgi?id=2360851
 # https://gitlab.freedesktop.org/mesa/mesa/-/issues/13009
-Patch30:        0001-Revert-kopper-Explicitly-choose-zink.patch
+Patch40:        0001-Revert-kopper-Explicitly-choose-zink.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
