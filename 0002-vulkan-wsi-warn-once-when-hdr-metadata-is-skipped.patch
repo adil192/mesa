@@ -1,0 +1,34 @@
+From 0c1f2b90c97b46b6c0576643353f4c0a494e36a6 Mon Sep 17 00:00:00 2001
+From: Xaver Hugl <xaver.hugl@kde.org>
+Date: Tue, 11 Mar 2025 14:11:23 +0100
+Subject: [PATCH] vulkan/wsi: warn once when HDR metadata is skipped because of
+ protocol errors
+
+Signed-off-by: Xaver Hugl <xaver.hugl@kde.org>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34000>
+---
+ src/vulkan/wsi/wsi_common_wayland.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/vulkan/wsi/wsi_common_wayland.c b/src/vulkan/wsi/wsi_common_wayland.c
+index 68254dc8610dc..6be46f49d1492 100644
+--- a/src/vulkan/wsi/wsi_common_wayland.c
++++ b/src/vulkan/wsi/wsi_common_wayland.c
+@@ -1251,8 +1251,12 @@ wsi_wl_swapchain_update_colorspace(struct wsi_wl_swapchain *chain)
+       .max_fall = round(chain->color.hdr_metadata.maxFrameAverageLightLevel),
+       .max_cll = round(chain->color.hdr_metadata.maxContentLightLevel),
+    };
+-   bool should_use_hdr_metadata = chain->color.has_hdr_metadata
+-                               && is_hdr_metadata_legal(&wayland_hdr_metadata);
++   bool should_use_hdr_metadata = chain->color.has_hdr_metadata;
++   if (should_use_hdr_metadata) {
++      should_use_hdr_metadata &= is_hdr_metadata_legal(&wayland_hdr_metadata);
++      if (!should_use_hdr_metadata)
++         mesa_log_once(MESA_LOG_WARN, "Not using HDR metadata to avoid protocol errors");
++   }
+    for (int i = 0; i < ARRAY_SIZE(colorspace_mapping); i++) {
+       if (colorspace_mapping[i].colorspace == chain->color.colorspace) {
+          should_use_hdr_metadata &= colorspace_mapping[i].should_use_hdr_metadata;
+-- 
+GitLab
+

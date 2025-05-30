@@ -1,0 +1,38 @@
+From dc90e33ad2b693b1b97ba844a79d709d15c45a2d Mon Sep 17 00:00:00 2001
+From: llyyr <llyyr.public@gmail.com>
+Date: Thu, 3 Apr 2025 09:19:42 +0530
+Subject: [PATCH] vulkan/wsi/wayland: initialize surface colorspace with
+ PASS_THROUGH_EXT
+
+Starting with sRGB meant we would refcount to -1 if an application
+chooses PASS_THROUGH. Instead, just initialize with PASS_THROUGH so the
+initial refcount of 0 reflects reality.
+
+Previously, we would segfault if an application chose PASS_THROUGH at
+swapchain initialization then switched to a color managed colorspace
+later in the runtime, because we would increment refcount from -1 -> 0
+and this would result in not creating a new color managed surface.
+
+Fixes: 789507c99c67 ("vulkan/wsi: implement the Wayland color management protocol")
+Signed-off-by: llyyr <llyyr.public@gmail.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34353>
+---
+ src/vulkan/wsi/wsi_common_wayland.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vulkan/wsi/wsi_common_wayland.c b/src/vulkan/wsi/wsi_common_wayland.c
+index 3f636a5aad1a0..57436b12a9efc 100644
+--- a/src/vulkan/wsi/wsi_common_wayland.c
++++ b/src/vulkan/wsi/wsi_common_wayland.c
+@@ -2315,7 +2315,7 @@ wsi_CreateWaylandSurfaceKHR(VkInstance _instance,
+    surface->surface = pCreateInfo->surface;
+ 
+    wsi_wl_surface->instance = instance;
+-   wsi_wl_surface->color.colorspace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
++   wsi_wl_surface->color.colorspace = VK_COLOR_SPACE_PASS_THROUGH_EXT;
+ 
+    *pSurface = VkIcdSurfaceBase_to_handle(&surface->base);
+ 
+-- 
+GitLab
+

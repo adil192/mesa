@@ -1,0 +1,38 @@
+From 033ce1bae1505467fb69bf727377318421cb7731 Mon Sep 17 00:00:00 2001
+From: llyyr <llyyr.public@gmail.com>
+Date: Fri, 25 Apr 2025 10:41:06 +0530
+Subject: [PATCH] vulkan/wsi/wayland: make needs_color_surface_old check if
+ surface exists
+
+Otherwise we end up removing refcount even when we don't have a color
+surface already for applications going from SRGB_NONLINEAR to
+PASS_THROUGH dring runtime.
+
+To reproduce the bug, start mpv with "--target-colorspace-hint=yes" then
+set it to "no" during runtime with a keybind
+
+Fixes: 789507c99c67 ("vulkan/wsi: implement the Wayland color management protocol")
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34708>
+---
+ src/vulkan/wsi/wsi_common_wayland.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/vulkan/wsi/wsi_common_wayland.c b/src/vulkan/wsi/wsi_common_wayland.c
+index 7c1efda1f274e..938a9cd7c181b 100644
+--- a/src/vulkan/wsi/wsi_common_wayland.c
++++ b/src/vulkan/wsi/wsi_common_wayland.c
+@@ -1238,8 +1238,9 @@ wsi_wl_swapchain_update_colorspace(struct wsi_wl_swapchain *chain)
+ 
+    bool new_color_surface = !surface->color.color_surface;
+    bool needs_color_surface_new = needs_color_surface(display, chain->color.colorspace);
+-   bool needs_color_surface_old = needs_color_surface(display, surface->color.colorspace);
+-   if ((new_color_surface || !needs_color_surface_old) && needs_color_surface_new) {
++   bool needs_color_surface_old = surface->color.color_surface &&
++      needs_color_surface(display, surface->color.colorspace);
++   if (!needs_color_surface_old && needs_color_surface_new) {
+       wsi_wl_surface_add_color_refcount(surface);
+    } else if (needs_color_surface_old && !needs_color_surface_new) {
+       wsi_wl_surface_remove_color_refcount(surface);
+-- 
+GitLab
+
