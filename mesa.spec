@@ -8,7 +8,7 @@
 %if !0%{?rhel}
 %global with_r300 1
 %global with_r600 1
-%global with_nine 1
+%global with_nine 0
 %global with_opencl 1
 %endif
 %if !0%{?rhel} || 0%{?rhel} >= 10
@@ -27,7 +27,7 @@
 %global with_crocus 1
 %global with_iris   1
 %global with_xa     1
-%global with_intel_clc 1
+%global with_intel_clc 0
 %global intel_platform_vulkan %{?with_vulkan_hw:,intel,intel_hasvk}%{!?with_vulkan_hw:%{nil}}
 %if !0%{?rhel}
 %global with_i915   1
@@ -79,7 +79,7 @@
 
 Name:           mesa
 Summary:        Mesa graphics libraries
-%global ver 25.1.4
+%global ver 25.2.1
 Version:        %{lua:ver = string.gsub(rpm.expand("%{ver}"), "-", "~"); print(ver)}
 Release:        %autorelease
 License:        MIT AND BSD-3-Clause AND SGI-B-2.0
@@ -95,15 +95,17 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 # https://gitlab.freedesktop.org/mesa/mesa/-/tree/main/subprojects
 # but we generally want the latest compatible versions
 %global rust_paste_ver 1.0.15
-%global rust_proc_macro2_ver 1.0.97
+%global rust_proc_macro2_ver 1.0.101
 %global rust_quote_ver 1.0.40
-%global rust_syn_ver 2.0.104
+%global rust_syn_ver 2.0.106
 %global rust_unicode_ident_ver 1.0.18
+%global rustc_hash_ver 2.1.1
 Source10:       https://crates.io/api/v1/crates/paste/%{rust_paste_ver}/download#/paste-%{rust_paste_ver}.tar.gz
 Source11:       https://crates.io/api/v1/crates/proc-macro2/%{rust_proc_macro2_ver}/download#/proc-macro2-%{rust_proc_macro2_ver}.tar.gz
 Source12:       https://crates.io/api/v1/crates/quote/%{rust_quote_ver}/download#/quote-%{rust_quote_ver}.tar.gz
 Source13:       https://crates.io/api/v1/crates/syn/%{rust_syn_ver}/download#/syn-%{rust_syn_ver}.tar.gz
 Source14:       https://crates.io/api/v1/crates/unicode-ident/%{rust_unicode_ident_ver}/download#/unicode-ident-%{rust_unicode_ident_ver}.tar.gz
+Source15:       https://crates.io/api/v1/crates/rustc-hash/%{rustc_hash_ver}/download#/rustc-hash-%{rustc_hash_ver}.tar.gz
 
 Patch10:        gnome-shell-glthread-disable.patch
 
@@ -390,6 +392,7 @@ tar -xvf %{SOURCE11} -C subprojects/packagecache/
 tar -xvf %{SOURCE12} -C subprojects/packagecache/
 tar -xvf %{SOURCE13} -C subprojects/packagecache/
 tar -xvf %{SOURCE14} -C subprojects/packagecache/
+tar -xvf %{SOURCE15} -C subprojects/packagecache/
 for d in subprojects/packagecache/*-*; do
     echo '{"files":{}}' > $d/.cargo-checksum.json
 done
@@ -409,6 +412,7 @@ path = "src/nouveau/nil/lib.rs"
 [dependencies]
 paste = "$(grep ^directory subprojects/paste.wrap | sed 's|.*-||')"
 syn = { version = "$(grep ^directory subprojects/syn.wrap | sed 's|.*-||')", features = ["clone-impls"] }
+rustc-hash = "$(grep ^directory subprojects/rustc-hash.wrap | sed 's|.*-||')"
 _EOF
 %if 0%{?vendor_nvk_crates}
 %cargo_prep -v subprojects/packagecache
@@ -439,6 +443,7 @@ rewrite_wrap_file quote
 rewrite_wrap_file syn
 rewrite_wrap_file unicode-ident
 rewrite_wrap_file paste
+rewrite_wrap_file rustc-hash
 %endif
 
 # We've gotten a report that enabling LTO for mesa breaks some games. See
@@ -448,7 +453,6 @@ rewrite_wrap_file paste
 
 %meson \
   -Dplatforms=x11,wayland \
-  -Dosmesa=true \
 %if 0%{?with_hardware}
   -Dgallium-drivers=llvmpipe,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_asahi:,asahi}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink}%{?with_d3d12:,d3d12} \
 %else
@@ -456,16 +460,13 @@ rewrite_wrap_file paste
 %endif
   -Dgallium-vdpau=%{?with_vdpau:enabled}%{!?with_vdpau:disabled} \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
-  -Dgallium-xa=%{?with_xa:enabled}%{!?with_xa:disabled} \
-  -Dgallium-nine=%{?with_nine:true}%{!?with_nine:false} \
+  -Dgallium-mediafoundation=disabled \
   -Dteflon=%{?with_teflon:true}%{!?with_teflon:false} \
 %if 0%{?with_opencl}
   -Dgallium-rusticl=true \
-  -Dgallium-opencl=disabled \
 %endif
   -Dvulkan-drivers=%{?vulkan_drivers} \
   -Dvulkan-layers=device-select \
-  -Dshared-glapi=enabled \
   -Dgles1=enabled \
   -Dgles2=enabled \
   -Dopengl=true \
@@ -482,7 +483,6 @@ rewrite_wrap_file paste
   -Dshared-llvm=enabled \
   -Dvalgrind=%{?with_valgrind:enabled}%{!?with_valgrind:disabled} \
   -Dbuild-tests=false \
-  -Dselinux=true \
 %if !0%{?with_libunwind}
   -Dlibunwind=disabled \
 %endif
@@ -562,23 +562,6 @@ popd
 %{_includedir}/gbm.h
 %{_includedir}/gbm_backend_abi.h
 %{_libdir}/pkgconfig/gbm.pc
-
-%if 0%{?with_xa}
-%files libxatracker
-%if 0%{?with_hardware}
-%{_libdir}/libxatracker.so.2
-%{_libdir}/libxatracker.so.2.*
-%endif
-
-%files libxatracker-devel
-%if 0%{?with_hardware}
-%{_libdir}/libxatracker.so
-%{_includedir}/xa_tracker.h
-%{_includedir}/xa_composite.h
-%{_includedir}/xa_context.h
-%{_libdir}/pkgconfig/xatracker.pc
-%endif
-%endif
 
 %if 0%{?with_teflon}
 %files libTeflon
