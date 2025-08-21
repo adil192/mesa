@@ -27,7 +27,7 @@
 %global with_crocus 1
 %global with_iris   1
 %global with_xa     1
-%global with_intel_clc 1
+%global with_intel_clc 0
 %global intel_platform_vulkan %{?with_vulkan_hw:,intel,intel_hasvk}%{!?with_vulkan_hw:%{nil}}
 %if !0%{?rhel}
 %global with_i915   1
@@ -79,7 +79,7 @@
 
 Name:           mesa
 Summary:        Mesa graphics libraries
-%global ver 25.2.0
+%global ver 25.2.1
 Version:        %{lua:ver = string.gsub(rpm.expand("%{ver}"), "-", "~"); print(ver)}
 Release:        %autorelease
 License:        MIT AND BSD-3-Clause AND SGI-B-2.0
