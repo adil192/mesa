@@ -15,7 +15,7 @@
 %global base_vulkan %{?with_vulkan_hw:,amd}%{!?with_vulkan_hw:%{nil}}
 %endif
 
-%ifnarch %{ix86}
+%ifarch aarch64 || x86_64
 %if !0%{?rhel}
 %global with_teflon 1
 %endif
@@ -51,7 +51,7 @@
 %if 0%{?with_asahi}
 %global asahi_platform_vulkan %{?with_vulkan_hw:,asahi}%{!?with_vulkan_hw:%{nil}}
 %endif
-%global extra_platform_vulkan %{?with_vulkan_hw:,broadcom,freedreno,panfrost,imagination-experimental}%{!?with_vulkan_hw:%{nil}}
+%global extra_platform_vulkan %{?with_vulkan_hw:,broadcom,freedreno,panfrost,imagination}%{!?with_vulkan_hw:%{nil}}
 %endif
 
 %if !0%{?rhel}
@@ -74,7 +74,7 @@
 
 Name:           mesa
 Summary:        Mesa graphics libraries
-%global ver 25.2.5
+%global ver 25.3.0-rc1
 Version:        %{lua:ver = string.gsub(rpm.expand("%{ver}"), "-", "~"); print(ver)}
 Release:        %autorelease
 License:        MIT AND BSD-3-Clause AND SGI-B-2.0
@@ -125,6 +125,7 @@ BuildRequires:  pkgconfig(wayland-protocols) >= 1.34
 BuildRequires:  pkgconfig(wayland-client) >= 1.11
 BuildRequires:  pkgconfig(wayland-server) >= 1.11
 BuildRequires:  pkgconfig(wayland-egl-backend) >= 3
+BuildRequires:  pkgconfig(libdisplay-info)
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(xdamage) >= 1.1
@@ -358,7 +359,7 @@ done
 cat > Cargo.toml <<_EOF
 [package]
 name = "mesa"
-version = "%{version}"
+version = "%{ver}"
 edition = "2021"
 
 [lib]
@@ -366,9 +367,9 @@ path = "src/nouveau/nil/lib.rs"
 
 # only direct dependencies need to be listed here
 [dependencies]
-paste = "$(grep ^directory subprojects/paste.wrap | sed 's|.*-||')"
-syn = { version = "$(grep ^directory subprojects/syn.wrap | sed 's|.*-||')", features = ["clone-impls"] }
-rustc-hash = "$(grep ^directory subprojects/rustc-hash.wrap | sed 's|.*-||')"
+paste = "$(grep ^directory subprojects/paste*.wrap | sed 's|.*-||')"
+syn = { version = "$(grep ^directory subprojects/syn*.wrap | sed 's|.*-||')", features = ["clone-impls"] }
+rustc-hash = "$(grep ^directory subprojects/rustc-hash*.wrap | sed 's|.*-||')"
 _EOF
 %if 0%{?vendor_nvk_crates}
 %cargo_prep -v subprojects/packagecache
@@ -391,7 +392,7 @@ export RUSTFLAGS="%build_rustflags"
 export MESON_PACKAGE_CACHE_DIR="%{cargo_registry}/"
 %endif
 rewrite_wrap_file() {
-   sed -e "/source.*/d" -e "s/${1}-.*/$(basename ${MESON_PACKAGE_CACHE_DIR:-subprojects/packagecache}/${1}-*)/" -i subprojects/${1}.wrap
+   sed -e "/source.*/d" -e "s/^directory = ${1}-.*/directory = $(basename ${MESON_PACKAGE_CACHE_DIR:-subprojects/packagecache}/${1}-*)/" -i subprojects/${1}*.wrap
 }
 
 rewrite_wrap_file proc-macro2
@@ -410,11 +411,10 @@ rewrite_wrap_file rustc-hash
 %meson \
   -Dplatforms=x11,wayland \
 %if 0%{?with_hardware}
-  -Dgallium-drivers=llvmpipe,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_asahi:,asahi}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink}%{?with_d3d12:,d3d12} \
+  -Dgallium-drivers=llvmpipe,virgl,nouveau%{?with_r300:,r300}%{?with_crocus:,crocus}%{?with_i915:,i915}%{?with_iris:,iris}%{?with_vmware:,svga}%{?with_radeonsi:,radeonsi}%{?with_r600:,r600}%{?with_asahi:,asahi}%{?with_freedreno:,freedreno}%{?with_etnaviv:,etnaviv}%{?with_tegra:,tegra}%{?with_vc4:,vc4}%{?with_v3d:,v3d}%{?with_lima:,lima}%{?with_panfrost:,panfrost}%{?with_vulkan_hw:,zink}%{?with_d3d12:,d3d12}%{?with_teflon:,ethosu,rocket} \
 %else
   -Dgallium-drivers=llvmpipe,virgl \
 %endif
-  -Dgallium-vdpau=disabled \
   -Dgallium-va=%{?with_va:enabled}%{!?with_va:disabled} \
   -Dgallium-mediafoundation=disabled \
   -Dteflon=%{?with_teflon:true}%{!?with_teflon:false} \
@@ -517,6 +517,7 @@ popd
 %if 0%{?with_teflon}
 %files libTeflon
 %{_libdir}/libteflon.so
+%{_libdir}/dri/rocket_dri.so
 %endif
 
 %if 0%{?with_opencl}
@@ -699,7 +700,6 @@ popd
 %{_datadir}/vulkan/icd.d/freedreno_icd.*.json
 %{_libdir}/libvulkan_panfrost.so
 %{_datadir}/vulkan/icd.d/panfrost_icd.*.json
-%{_libdir}/libpowervr_rogue.so
 %{_libdir}/libvulkan_powervr_mesa.so
 %{_datadir}/vulkan/icd.d/powervr_mesa_icd.*.json
 %endif
