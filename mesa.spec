@@ -89,6 +89,10 @@ Source1:        Mesa-MLAA-License-Clarification-Email.txt
 
 Patch10:        gnome-shell-glthread-disable.patch
 
+# zink + nvk + hotplug fails
+# https://gitlab.freedesktop.org/mesa/mesa/-/issues/14148
+Patch15:        wayland-display-hacks.patch
+
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
