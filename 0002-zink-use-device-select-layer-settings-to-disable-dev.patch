@@ -1,4 +1,4 @@
-From 4992926d49e45a4c1af2a178daf465283735fcc9 Mon Sep 17 00:00:00 2001
+From 0cd27cc12456851abaf2c7cbe48362558f2c0e92 Mon Sep 17 00:00:00 2001
 From: Dave Airlie <airlied@redhat.com>
 Date: Wed, 5 Nov 2025 11:02:26 +1000
 Subject: [PATCH 2/2] zink: use device select layer settings to disable device
@@ -16,7 +16,7 @@ device selection anyways.
  2 files changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/src/gallium/drivers/zink/zink_instance.py b/src/gallium/drivers/zink/zink_instance.py
-index 37aa8a14c19..af8412c2c98 100644
+index 37aa8a14c19..ede14e8ac19 100644
 --- a/src/gallium/drivers/zink/zink_instance.py
 +++ b/src/gallium/drivers/zink/zink_instance.py
 @@ -37,6 +37,7 @@ import platform
@@ -50,14 +50,14 @@ index 37aa8a14c19..af8412c2c98 100644
     ici.ppEnabledLayerNames = layers;
     ici.enabledLayerCount = num_layers;
  
++   VkLayerSettingsCreateInfoEXT lsci = {0};
++   VkLayerSettingEXT ds_layer = {0};
 +   if (have_EXT_layer_settings && have_layer_MESA_device_select) {
-+       VkLayerSettingEXT ds_layer = {0};
 +       ds_layer.pLayerName = "MESA_device_select";
 +       ds_layer.pSettingName = "no_device_select";
 +       ds_layer.type = VK_LAYER_SETTING_TYPE_BOOL32_EXT;
 +       ds_layer.valueCount = 1;
 +       ds_layer.pValues = &instance_info->no_device_select;
-+       VkLayerSettingsCreateInfoEXT lsci = {0};
 +       lsci.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT;
 +       lsci.settingCount = 1;
 +       lsci.pSettings = &ds_layer;
