@@ -107,6 +107,9 @@ Source15:       https://crates.io/api/v1/crates/rustc-hash/%{rustc_hash_ver}/dow
 Patch10:        0001-device-select-add-a-layer-setting-to-disable-device-.patch
 Patch11:        0002-zink-use-device-select-layer-settings-to-disable-dev.patch
 
+# fix c11/threads builds problem on f44
+Patch20:        0001-c11-threads-fix-build-on-fedora-44.patch
+
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
