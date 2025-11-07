@@ -81,6 +81,7 @@
 Name:           mesa
 Summary:        Mesa graphics libraries
 Version:        25.3.5
+Epoch:          1
 Release:        %autorelease
 License:        MIT AND BSD-3-Clause AND SGI-B-2.0
 URL:            https://mesa3d.org
@@ -470,6 +471,7 @@ rewrite_wrap_file rustc-hash
   -Dlmsensors=disabled \
 %endif
   -Dandroid-libbacktrace=disabled \
+  -Dvideo-codecs=all \
 %ifarch %{ix86}
   -Dglx-read-only-text=true \
 %endif
