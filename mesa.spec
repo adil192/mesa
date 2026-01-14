@@ -110,6 +110,10 @@ Patch10:        gnome-shell-glthread-disable.patch
 Patch11:        0001-device-select-add-a-layer-setting-to-disable-device-.patch
 Patch12:        0002-zink-use-device-select-layer-settings-to-disable-dev.patch
 
+# backport (fix compile error)
+# https://gitlab.freedesktop.org/mesa/mesa/-/commit/cd129dbf8af2d16b1243f2ce287ff69c6a5dc557
+Patch18:	cd129dbf8af2d16b1243f2ce287ff69c6a5dc557.patch
+
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
