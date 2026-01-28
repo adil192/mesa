@@ -78,11 +78,15 @@
 
 Name:           mesa
 Summary:        Mesa graphics libraries
-%global ver 25.3.4
-Version:        %{gsub %ver - ~}
+Version:        25.3.4
 Release:        %autorelease
 License:        MIT AND BSD-3-Clause AND SGI-B-2.0
 URL:            http://www.mesa3d.org
+
+# The "Version" field for release candidates has the format: A.B.C~rcX
+# However, the tarball has the format: A.B.C-rcX.
+# The "ver" variable contains the version in the second format.
+%global ver %{gsub %version ~ -}
 
 Source0:        https://archive.mesa3d.org/mesa-%{ver}.tar.xz
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.
