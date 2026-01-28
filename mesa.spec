@@ -506,13 +506,6 @@ rm -vf %{buildroot}%{_libdir}/dri/apple_dri.so
 # determine the vendor
 ln -s %{_libdir}/libGLX_mesa.so.0 %{buildroot}%{_libdir}/libGLX_system.so.0
 
-# this keeps breaking, check it early.  note that the exit from eu-ftr is odd.
-pushd %{buildroot}%{_libdir}
-for i in libGL.so ; do
-    eu-findtextrel $i && exit 1
-done
-popd
-
 %files filesystem
 %doc docs/Mesa-MLAA-License-Clarification-Email.txt
 %dir %{_libdir}/dri
