@@ -234,8 +234,8 @@ Obsoletes:      %{name}-libOSMesa < 25.1.0~rc2-1
 Summary:        Mesa libGL development package
 Requires:       (%{name}-libGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release} if %{name}-libGL%{?_isa})
 Requires:       libglvnd-devel%{?_isa} >= 1:1.3.2
-Provides:       libGL-devel
-Provides:       libGL-devel%{?_isa}
+Provides:       libGL-devel = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       libGL-devel%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Recommends:     gl-manpages
 Obsoletes:      %{name}-libOSMesa-devel < 25.1.0~rc2-1
 
@@ -256,8 +256,8 @@ Summary:        Mesa libEGL development package
 Requires:       (%{name}-libEGL%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release} if %{name}-libEGL%{?_isa})
 Requires:       libglvnd-devel%{?_isa} >= 1:1.3.2
 Requires:       %{name}-khr-devel%{?_isa}
-Provides:       libEGL-devel
-Provides:       libEGL-devel%{?_isa}
+Provides:       libEGL-devel = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       libEGL-devel%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libEGL-devel
 %{summary}.
@@ -286,8 +286,8 @@ Obsoletes:      %{name}-vaapi-drivers < 22.2.0-5
 
 %package libgbm
 Summary:        Mesa gbm runtime library
-Provides:       libgbm
-Provides:       libgbm%{?_isa}
+Provides:       libgbm = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       libgbm%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Recommends:     %{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 # If mesa-dri-drivers are installed, they must match in version. This is here to prevent using
 # older mesa-dri-drivers together with a newer mesa-libgbm and its dependants.
@@ -300,8 +300,8 @@ Requires:       (%{name}-dri-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{r
 %package libgbm-devel
 Summary:        Mesa libgbm development package
 Requires:       %{name}-libgbm%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
-Provides:       libgbm-devel
-Provides:       libgbm-devel%{?_isa}
+Provides:       libgbm-devel = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       libgbm-devel%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 
 %description libgbm-devel
 %{summary}.
