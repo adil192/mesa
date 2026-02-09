@@ -20,10 +20,10 @@ jobs:
     dist_git_branches:
       - fedora-all
 
-  # The bodhi_update job is not configured as it is not possible to configure or
-  # disable karma:
-  # https://github.com/packit/packit-service/issues/2757
-  # - job: bodhi_update
-  #   trigger: commit
-  #   dist_git_branches:
-  #     - fedora-branched
+  - job: bodhi_update
+    trigger: commit
+    dist_git_branches:
+      - fedora-branched
+    bodhi_extra_params:
+      autokarma: false
+      autotime: false
