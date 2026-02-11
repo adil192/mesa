@@ -3,7 +3,7 @@ upstream_tag_template: mesa-{version}
 
 jobs:
   - job: pull_from_upstream
-    upstream_tag_include: "^mesa-25\\.3\\..*$"
+    upstream_tag_include: "^mesa-26\\.0\\..*$"
     trigger: release
     dist_git_branches:
       - rawhide
@@ -12,6 +12,7 @@ jobs:
     upstream_tag_include: "^mesa-25\\.3\\..*$"
     trigger: release
     dist_git_branches:
+      - f44
       - f43
 
   - job: koji_build
@@ -19,10 +20,10 @@ jobs:
     dist_git_branches:
       - fedora-all
 
-  # The bodhi_update job is not configured as it is not possible to configure or
-  # disable karma:
-  # https://github.com/packit/packit-service/issues/2757
-  # - job: bodhi_update
-  #   trigger: commit
-  #   dist_git_branches:
-  #     - fedora-branched
+  - job: bodhi_update
+    trigger: commit
+    dist_git_branches:
+      - fedora-branched
+    bodhi_extra_params:
+      autokarma: false
+      autotime: false
