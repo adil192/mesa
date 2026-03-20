@@ -7,12 +7,12 @@ jobs:
     trigger: release
     dist_git_branches:
       - rawhide
+      - f44
 
   - job: pull_from_upstream
     upstream_tag_include: "^mesa-25\\.3\\..*$"
     trigger: release
     dist_git_branches:
-      - f44
       - f43
 
   - job: koji_build
