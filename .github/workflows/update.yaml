@@ -1,0 +1,80 @@
+name: Update mesa
+on:
+  workflow_dispatch:
+  schedule:
+    # every 2 days at 22:09 (random time to avoid spikes in GitHub Actions usage)
+    - cron: "09 22 */2 * *"
+
+jobs:
+  update-mesa:
+    name: Update mesa
+    runs-on: ubuntu-latest
+    env:
+      FOUND_MESA_UPDATE: ""
+      MESA_TAG: ""
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Update
+        run: |
+          # Clone the repo into a temporary directory
+          BUILD_REPO="https://gitlab.freedesktop.org/mesa/mesa.git"
+          TEMP_DIR=$(mktemp -d /tmp/mesa-rc-copr.XXXXX)
+          git clone --bare --depth=1 --no-single-branch --filter=blob:none "$BUILD_REPO" "$TEMP_DIR/mesa-git"
+
+          # Fetch tags
+          git -C "$TEMP_DIR/mesa-git" fetch --tags
+
+          # Find the latest tag, e.g. `mesa-26.0.0-rc3`...
+          # Get the 10 latest tags
+          ALL_TAGS=$(git -C "$TEMP_DIR/mesa-git" tag -l 'mesa-*' --sort creatordate | tail -n10 | sort -V)
+          # Get latest stable release (not release candidate)
+          LATEST_FINAL=$(echo "$ALL_TAGS" | grep -v -- '-rc' | tail -n1)
+          # Get latest release candidate
+          LATEST_RC=$(echo "$ALL_TAGS" | tail -n1)
+          if [[ "$LATEST_RC" == *-rc1 ]]; then
+            # We don't consider rc1 to be stable enough.
+            MESA_TAG="$LATEST_FINAL"
+          elif [[ "$LATEST_RC" == "$LATEST_FINAL"-rc* ]]; then
+            # If that was a release candidate of LATEST_FINAL, use LATEST_FINAL
+            MESA_TAG="$LATEST_FINAL"
+          else
+            # Replace mesa-A.B.C-rcN with mesa-A.B.C~rcN
+            MESA_TAG="${LATEST_RC//-rc/\~rc}"
+          fi
+          echo "MESA_TAG=$MESA_TAG" >> $GITHUB_ENV
+          echo "Latest tag: $MESA_TAG"
+
+          # Copy the spec and replace its version
+          cp mesa.spec mesa.spec.new
+          STRIPPED="${MESA_TAG#mesa-}" # e.g. `26.0.0-rc3`
+          sed -i "s/Version:        [0-9.~rc]*$/Version:        $STRIPPED/" mesa.spec.new
+
+          # Exit early if the spec file hasn't changed
+          if cmp -s mesa.spec mesa.spec.new; then
+            echo "FOUND_MESA_UPDATE=false" >> $GITHUB_ENV
+            echo "Spec file was already up-to-date."
+            rm mesa.spec.new
+            exit 0
+          fi
+          echo "FOUND_MESA_UPDATE=true" >> $GITHUB_ENV
+          mv mesa.spec.new mesa.spec
+          echo "Updated spec file to $MESA_TAG"
+
+          # Update mesa-*.tar.xz hash in `sources` file
+          curl -L "https://archive.mesa3d.org/$MESA_TAG.tar.xz" -o "$MESA_TAG.tar.xz"
+          HASHSUM=$(sha512sum "$MESA_TAG.tar.xz" | cut -d' ' -f1)
+          sed -i "s/^SHA512 (mesa-[0-9.]*\.tar\.xz) = .*$/SHA512 (mesa-$STRIPPED.tar.xz) = $HASHSUM/" sources
+
+      - name: Create Pull Request
+        if: env.FOUND_MESA_UPDATE == 'true'
+        uses: peter-evans/create-pull-request@v8
+        env:
+          SUMMARY: "Update to ${{ env.MESA_TAG }}"
+        with:
+          title: ${{ env.SUMMARY }}
+          commit-message: ${{ env.SUMMARY }}
+          branch: "update/${{ env.MESA_TAG }}"
+          body: ${{ env.SUMMARY }}
+          assignees: adil192
