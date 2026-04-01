@@ -62,11 +62,6 @@ jobs:
           mv mesa.spec.new mesa.spec
           echo "Updated spec file to $MESA_TAG"
 
-          # Update mesa-*.tar.xz hash in `sources` file
-          curl -L "https://archive.mesa3d.org/$MESA_TAG.tar.xz" -o "$MESA_TAG.tar.xz"
-          HASHSUM=$(sha512sum "$MESA_TAG.tar.xz" | cut -d' ' -f1)
-          sed -i "s/^SHA512 (mesa-[0-9.]*\.tar\.xz) = .*$/SHA512 (mesa-$STRIPPED.tar.xz) = $HASHSUM/" sources
-
       - name: Create Pull Request
         if: env.FOUND_MESA_UPDATE == 'true'
         uses: peter-evans/create-pull-request@v8
