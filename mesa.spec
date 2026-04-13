@@ -272,7 +272,8 @@ Summary:        Mesa-based DRI drivers
 Requires:       %{name}-filesystem%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      %{name}-libglapi < 25.0.0~rc2-1
 Obsoletes:      %{name}-va-drivers < 26.0.0-5
-Provides:       %{name}-va-drivers >= 26.0.0-5
+Provides:       %{name}-va-drivers = %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:       %{name}-va-drivers%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
 Obsoletes:      %{name}-vaapi-drivers < 22.2.0-5
 
 %description dri-drivers
