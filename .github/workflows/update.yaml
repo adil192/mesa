@@ -33,8 +33,11 @@ jobs:
           LATEST_FINAL=$(echo "$ALL_TAGS" | grep -v -- '-rc' | tail -n1)
           # Get latest release candidate
           LATEST_RC=$(echo "$ALL_TAGS" | tail -n1)
-          # If that was a release candidate of LATEST_FINAL, use LATEST_FINAL
-          if [[ "$LATEST_RC" == "$LATEST_FINAL-rc"* ]]; then
+          if [[ "$LATEST_RC" == *-rc1 ]]; then
+            # We don't consider rc1 to be stable enough.
+            MESA_TAG="$LATEST_FINAL"
+          else if [[ "$LATEST_RC" == "$LATEST_FINAL"-rc* ]]; then
+            # If that was a release candidate of LATEST_FINAL, use LATEST_FINAL
             MESA_TAG="$LATEST_FINAL"
           else
             # Replace mesa-A.B.C-rcN with mesa-A.B.C~rcN
