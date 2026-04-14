@@ -117,6 +117,10 @@ Source15:       https://crates.io/api/v1/crates/rustc-hash/%{rustc_hash_ver}/dow
 # which fixes compile-time conditional on AVX2 which is not built on Fedora
 Patch21:        39951.patch
 
+# test patch to disable nvk texture promotion and fix gnome-initial-config
+# https://bugzilla.redhat.com/show_bug.cgi?id=2359799
+Patch30: 0001-nvk-don-t-set-promotion-on-texture-headers.patch
+
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
