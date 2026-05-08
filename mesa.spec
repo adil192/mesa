@@ -185,6 +185,9 @@ BuildRequires:  rust-toolset
 BuildRequires:  cargo-rpm-macros
 %endif
 %endif
+%if 0%{?with_opencl}
+BuildRequires:  libstdc++-static
+%endif
 %if 0%{?with_nvk}
 BuildRequires:  cbindgen
 %endif
