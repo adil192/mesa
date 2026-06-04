@@ -21,7 +21,7 @@ reboot
 
 You can temporarily revert to Fedora's stable packages with this command. The next time you update your packages, mesa-rc will be reinstalled.
 ```bash
-sudo dnf --disablerepo=copr:copr.fedorainfracloud.org:adil192/mesa-rc* distro-sync
+sudo dnf --disablerepo=copr:copr.fedorainfracloud.org:adil192:mesa-rc* distro-sync
 ```
 
 Or permanently go back to Fedora's stable packages:
