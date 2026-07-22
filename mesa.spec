@@ -543,7 +543,7 @@ ln -s libGLX_mesa.so.0 %{buildroot}%{_libdir}/libGLX_system.so.0
 %endif
 
 %files dri-drivers
-%{_datadir}/drirc.d/00-mesa-defaults.conf
+%{_datadir}/drirc.d/00-*-defaults.conf
 %{_libdir}/libgallium-*.so
 %{_libdir}/gbm/dri_gbm.so
 %{_libdir}/dri/kms_swrast_dri.so
@@ -684,7 +684,6 @@ ln -s libGLX_mesa.so.0 %{buildroot}%{_libdir}/libGLX_system.so.0
 %endif
 %if 0%{?with_vulkan_hw}
 %{_libdir}/libvulkan_radeon.so
-%{_datadir}/drirc.d/00-radv-defaults.conf
 %{_datadir}/vulkan/icd.d/radeon_icd.*.json
 %if 0%{?with_nvk}
 %{_libdir}/libvulkan_nouveau.so
