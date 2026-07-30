@@ -48,7 +48,7 @@ jobs:
 
           # Copy the spec and replace its version
           cp mesa.spec mesa.spec.new
-          STRIPPED="${MESA_TAG#mesa-}" # e.g. `26.0.0-rc3`
+          STRIPPED="${MESA_TAG#mesa-}" # e.g. `26.0.0~rc3`
           sed -i "s/Version:        [0-9.~rc]*$/Version:        $STRIPPED/" mesa.spec.new
 
           # Exit early if the spec file hasn't changed
@@ -62,6 +62,10 @@ jobs:
           mv mesa.spec.new mesa.spec
           echo "Updated spec file to $MESA_TAG"
 
+          # Can't use tilde (~) in branch name
+          MESA_TAG_SANITIZED="${MESA_TAG//\~/-}"
+          echo "MESA_TAG_SANITIZED=$MESA_TAG_SANITIZED" >> $GITHUB_ENV
+
       - name: Create Pull Request
         if: env.FOUND_MESA_UPDATE == 'true'
         uses: peter-evans/create-pull-request@v8
@@ -70,6 +74,6 @@ jobs:
         with:
           title: ${{ env.SUMMARY }}
           commit-message: ${{ env.SUMMARY }}
-          branch: "update/${{ env.MESA_TAG }}"
+          branch: "update/${{ env.MESA_TAG_SANITIZED }}"
           body: ${{ env.SUMMARY }}
           assignees: adil192
