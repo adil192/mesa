@@ -115,7 +115,8 @@ Source15:       https://static.crates.io/crates/rustc-hash/rustc-hash-%{rustc_ha
 
 # Open Gaming Collective Patches
 Patch30:        https://raw.githubusercontent.com/OpenGamingCollective/mesa/refs/heads/main/limiter.patch
-Patch31:        https://raw.githubusercontent.com/OpenGamingCollective/mesa/refs/heads/main/radv-defaults.patch
+# This patch was removed since it isn't yet compatible with mesa 26.2.0~rc3. Only affects ForzaHorizon5.
+# Patch31:        https://raw.githubusercontent.com/OpenGamingCollective/mesa/refs/heads/main/radv-defaults.patch
 
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
