@@ -113,6 +113,10 @@ Source13:       https://static.crates.io/crates/syn/syn-%{rust_syn_ver}.crate
 Source14:       https://static.crates.io/crates/unicode-ident/unicode-ident-%{rust_unicode_ident_ver}.crate
 Source15:       https://static.crates.io/crates/rustc-hash/rustc-hash-%{rustc_hash_ver}.crate
 
+# Open Gaming Collective Patches
+Patch30:        https://raw.githubusercontent.com/OpenGamingCollective/mesa/refs/heads/main/limiter.patch
+Patch31:        https://raw.githubusercontent.com/OpenGamingCollective/mesa/refs/heads/main/radv-defaults.patch
+
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
